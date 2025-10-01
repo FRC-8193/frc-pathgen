@@ -9,13 +9,19 @@ A small simulation designed to test **path generation** and **following** algori
 4. `pkg-config`
 
 ### Download
+```
 $ git clone https://github.com/FRC-8193/frc-pathgen.git --recurse-submodules
+```
 ### Build
+```
 $ cd frc-pathgen
 $ cmake -B build
 $ cmake --build build -j
+```
 ### Run
+```
 $ build/frc-pathgen
+```
 
 > [!NOTE]
 > Windows is unsupported but might work through MSYS2.
