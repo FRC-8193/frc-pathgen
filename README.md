@@ -27,6 +27,7 @@ $ build/frc-pathgen
 ```
 ## Contributing
 Contributions to `frc-pathgen` are always welcome. Make sure to follow our [style guide](https://github.com/FRC-8193/styleguide), and open a pull request with a detailed explanation of changes.  
+Be sure to add your name to the copyright notice of any files you edit!  
 > [!NOTE]
 > [`.clangd`](.clangd) is provided for use with editors connected to the `clangd` language server. Other IDEs can be configured for our build process.
 
