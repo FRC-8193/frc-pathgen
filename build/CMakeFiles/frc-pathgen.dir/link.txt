@@ -1,1 +1,0 @@
-/bin/c++ "CMakeFiles/frc-pathgen.dir/impl/main.cpp.o" -o frc-pathgen  -lSDL2 
