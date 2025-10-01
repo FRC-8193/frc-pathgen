@@ -8,6 +8,9 @@ A small simulation designed to test **path generation** and **following** algori
 3. A working C++ compiler
 4. `pkg-config`
 
+> [!NOTE]
+> Windows is unsupported but might work through MSYS2.
+
 ### Download
 ```
 $ git clone https://github.com/FRC-8193/frc-pathgen.git --recurse-submodules
@@ -22,8 +25,9 @@ $ cmake --build build -j
 ```
 $ build/frc-pathgen
 ```
-
+## Contributing
+Contributions to `frc-pathgen` are always welcome. Make sure to follow our [style guide](https://github.com/FRC-8193/styleguide), and open a pull request with a detailed explanation of changes.  
 > [!NOTE]
-> Windows is unsupported but might work through MSYS2.
+> [`.clangd](.clangd) is provided for use with editors connected to the `clangd` language server. Other IDEs can be configured for our build process.
 
 Made with ❤️ by Fred from team 8193 :)
