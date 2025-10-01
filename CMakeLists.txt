@@ -16,7 +16,8 @@ else()
 endif()
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/impl)
+add_subdirectory(${CMAKE_SOURCE_DIR}/extern/spdlog)
 
 add_executable(frc-pathgen ${FRC_PATHGEN_SOURCES})
 target_include_directories(frc-pathgen PRIVATE ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(frc-pathgen PRIVATE ${SDL2_LIBRARIES})
+target_link_libraries(frc-pathgen PRIVATE ${SDL2_LIBRARIES} spdlog::spdlog)
