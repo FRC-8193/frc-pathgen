@@ -38,6 +38,8 @@ App::App() {
   }
 
   this->renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+  this->viewport.width = WIDTH;
+  this->viewport.height = HEIGHT;
 }
 
 void App::run() {
@@ -49,6 +51,12 @@ void App::run() {
   bool running = true;
   SDL_Event e;
 
+  Vec2 objects[] = {
+      {-1, -1}, {1, -1}, {-1, 1}, {1,1}
+  };
+
+  this->viewport.units_per_vw = 5.5;
+
   while (running) {
     while (SDL_PollEvent(&e)) {
       if (this->process_event(e)) continue;
@@ -57,6 +65,15 @@ void App::run() {
 
     SDL_SetRenderDrawColor(this->renderer, 100, 149, 237, 255);
     SDL_RenderClear(renderer);
+
+
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    for (auto& obj : objects) {
+        Vec2 px = this->viewport.world_to_px(obj);
+        SDL_Rect r{int(px.x - 5), int(px.y - 5), 10, 10};
+        SDL_RenderFillRect(renderer, &r);
+    }
+
     SDL_RenderPresent(renderer);
   }
 

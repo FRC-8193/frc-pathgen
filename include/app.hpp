@@ -9,6 +9,7 @@
 #pragma once
 
 #include <SDL2/SDL.h>
+#include "viewport.hpp"
 
 namespace frc_pathgen {
 
@@ -25,5 +26,6 @@ private:
 
   SDL_Window *window;
   SDL_Renderer *renderer;
+  Viewport viewport;
 };
 }
