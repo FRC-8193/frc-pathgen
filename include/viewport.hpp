@@ -6,6 +6,8 @@
 *   Because we are programmers, not lawyers!
 */
 
+#pragma once
+
 #include "vec2.hpp"
 
 namespace frc_pathgen {
@@ -24,7 +26,7 @@ struct Viewport {
   inline Vec2 ndc_to_px(Vec2 ndc) const {
     return Vec2{
       (ndc.x * 0.5f + 0.5f) * this->width, // remarkably shitty code
-      (ndc.y * 0.5f + 0.5f) * this->width + this->height/2.0f - this->width/2.0f
+      (ndc.y * 0.5f) * this->width + this->height/2.0f
     };
   }
 

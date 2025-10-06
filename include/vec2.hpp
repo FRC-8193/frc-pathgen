@@ -6,6 +6,8 @@
 *   Because we are programmers, not lawyers!
 */
 
+#pragma once
+
 namespace frc_pathgen {
 
 struct Vec2 {
