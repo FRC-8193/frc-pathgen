@@ -10,6 +10,7 @@
 
 #include <SDL2/SDL.h>
 #include "camera_controller.hpp"
+#include "robot.hpp"
 
 namespace frc_pathgen {
 

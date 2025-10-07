@@ -1,0 +1,53 @@
+/*
+* frc-pathgen/include/robot.hpp
+* Copyright (c) 2025 Frederick Ziola et al. (New Lothrop Robotics)
+* Licensed under MIT. see LICENSE file in the repository root.
+*   Use, copy, modify, and distribute as needed, simply credit the original author.
+*   Because we are programmers, not lawyers!
+*/
+
+#pragma once
+
+#include <math.h>
+#include <SDL2/SDL.h>
+#include "vec2.hpp"
+#include "viewport.hpp"
+
+namespace frc_pathgen {
+
+class Robot {
+public:
+  Robot() {}
+
+  inline Vec2 forward() const {
+    return Vec2 { cosf(this->rotation_radians), sinf(this->rotation_radians) };
+  }
+  inline Vec2 right() const {
+    return Vec2 { sinf(this->rotation_radians), -cosf(this->rotation_radians) };
+  }
+
+  void draw(SDL_Renderer *renderer, Viewport &viewport);
+private:
+  Vec2 frame_center;
+  float rotation_radians;
+
+  static constexpr float mass = 50.0; // kg
+  static constexpr float wheelbase = 60.0; // cm (side length)
+  static constexpr float wheel_dist = 42.0; // cm
+  static constexpr float moi = 3.0; // kg-m^2
+
+  static constexpr float wheel_torque = 35.0; // Ncm
+  static constexpr float wheel_radius = 4.375; // cm
+ 
+  static constexpr float wheel_torque_m = wheel_torque / 100.0f; // Nm
+  static constexpr float wheel_radius_m = wheel_radius / 100.0f; // m
+  static constexpr float wheel_dist_m   = wheel_dist / 100.0f;   // m
+
+  static constexpr float wheel_ground_force = wheel_torque_m / wheel_radius_m; // N
+  static constexpr float wheel_ground_torque = wheel_ground_force * wheel_dist_m; // Nm
+
+  // not a perfect model (should really be doing kinematics)
+  static constexpr float bot_acceleration = 4.0 * wheel_ground_force / mass; // m/s^2
+  static constexpr float bot_angular_acceleration = 4.0 * wheel_ground_torque / moi; // rad/s^2
+};
+}
