@@ -1,6 +1,7 @@
 set(FRC_PATHGEN_SOURCES 
   ${CMAKE_CURRENT_LIST_DIR}/main.cpp
   ${CMAKE_CURRENT_LIST_DIR}/app.cpp
- 
+  ${CMAKE_CURRENT_LIST_DIR}/camera_controller.cpp
+
   PARENT_SCOPE)
 

@@ -1,5 +1,5 @@
 /*
-* frc-pathgen/include/app.hpp
+* frc-pathgen/include/camera_controller.hpp
 * Copyright (c) 2025 Frederick Ziola et al. (New Lothrop Robotics)
 * Licensed under MIT. see LICENSE file in the repository root.
 *   Use, copy, modify, and distribute as needed, simply credit the original author.
@@ -9,24 +9,19 @@
 #pragma once
 
 #include <SDL2/SDL.h>
-#include "camera_controller.hpp"
+#include "viewport.hpp"
 
 namespace frc_pathgen {
 
-class App {
+class CameraController {
 public:
-  App();
+  CameraController(Viewport &viewport) : viewport(viewport) {
+  }
 
-  inline bool is_ok() const { return this->window != nullptr; }
-  
-  void run();
+  bool consume_event(SDL_Event &e);
 private:
-  void teardown();
-
-  SDL_Window *window;
-  SDL_Renderer *renderer;
-  Viewport viewport;
-
-  CameraController camera_controller;
+  Viewport &viewport;
+  bool mouse_down = false;
+  Vec2 last_mouse_pos;
 };
 }

@@ -16,7 +16,7 @@ static const unsigned int HEIGHT = 600;
 
 static int inst_count = 0;
 
-App::App() {
+App::App() : camera_controller(this->viewport) {
   this->window = nullptr;
 
   if (inst_count == 0) {
@@ -59,7 +59,7 @@ void App::run() {
 
   while (running) {
     while (SDL_PollEvent(&e)) {
-      if (this->process_event(e)) continue;
+      if (this->camera_controller.consume_event(e)) continue;
       if (e.type == SDL_QUIT) running = false;
     }
 
@@ -78,13 +78,6 @@ void App::run() {
   }
 
   this->teardown();
-}
-
-bool App::process_event(const SDL_Event &e) {
-  switch (e.type) {
-    default:
-      return false;
-  }
 }
 
 void App::teardown() {
