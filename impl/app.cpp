@@ -8,6 +8,7 @@
 
 #include <spdlog/spdlog.h>
 #include "app.hpp"
+#include "SDL_timer.h"
 #include "world.hpp"
 
 namespace frc_pathgen {
@@ -17,7 +18,7 @@ static const unsigned int HEIGHT = 1080;
 
 static int inst_count = 0;
 
-App::App() : camera_controller(this->viewport) {
+App::App() : camera_controller(this->viewport), robot() {
   this->window = nullptr;
 
   if (inst_count == 0) {
@@ -50,6 +51,7 @@ App::App() : camera_controller(this->viewport) {
 }
 
 void App::run() {
+  this->robot.set_angular_velocity_setpoint(1);
   if (!this->is_ok()) {
     spdlog::error("Attepmted to run an App in an invalid state!");
     return;
@@ -60,11 +62,26 @@ void App::run() {
 
   this->viewport.units_per_vw = 500;
 
+  Uint64 perf_freq = SDL_GetPerformanceFrequency();
+  Uint64 last_time = SDL_GetPerformanceCounter();
+
   while (running) {
+    Uint64 time = SDL_GetPerformanceCounter();
+
+    float dt = (float)(time - last_time) / perf_freq; // seconds
+    last_time = time;
+   
+    spdlog::info("{}", dt);
+
     while (SDL_PollEvent(&e)) {
       if (this->camera_controller.consume_event(e)) continue;
       if (e.type == SDL_QUIT) running = false;
     }
+
+    // Physics stuff
+    this->robot.tick(dt);
+
+    // Rendering
 
     SDL_SetRenderDrawColor(this->renderer, 16, 16, 16, 255);
     SDL_RenderClear(this->renderer);
