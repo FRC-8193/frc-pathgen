@@ -12,8 +12,8 @@
 
 namespace frc_pathgen {
 
-static const unsigned int WIDTH  = 800;
-static const unsigned int HEIGHT = 600;
+static const unsigned int WIDTH  = 1920;
+static const unsigned int HEIGHT = 1080;
 
 static int inst_count = 0;
 
@@ -58,7 +58,7 @@ void App::run() {
   bool running = true;
   SDL_Event e;
 
-  this->viewport.units_per_vw = 250;
+  this->viewport.units_per_vw = 500;
 
   while (running) {
     while (SDL_PollEvent(&e)) {
