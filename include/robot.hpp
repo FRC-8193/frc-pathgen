@@ -37,8 +37,8 @@ private:
   Vec2 frame_center = { 0,0 };
   float rotation_radians = 0.0;
 
-  Vec2 velocity_setpoint;
-  float angular_velocity_setpoint;
+  Vec2 velocity_setpoint = { 0,0 };
+  float angular_velocity_setpoint = 0.0;
 
   static constexpr float mass = 50.0; // kg
   static constexpr float wheelbase = 60.0; // cm (side length)
