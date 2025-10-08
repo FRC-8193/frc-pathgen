@@ -1,5 +1,5 @@
 /*
-* frc-pathgen/include/camera.hpp
+* frc-pathgen/include/viewport.hpp
 * Copyright (c) 2025 Frederick Ziola et al. (New Lothrop Robotics)
 * Licensed under MIT. see LICENSE file in the repository root.
 *   Use, copy, modify, and distribute as needed, simply credit the original author.
