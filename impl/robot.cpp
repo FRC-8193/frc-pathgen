@@ -11,7 +11,7 @@
 
 namespace frc_pathgen {
 
-void Robot::draw(SDL_Renderer *renderer, Viewport &viewport) {
+void Robot::draw(SDL_Renderer *renderer, const Viewport &viewport) {
   float hs = this->wheelbase / 2.0;
   Vec2 y = this->forward();
   Vec2 x = this->right();

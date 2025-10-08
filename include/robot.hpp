@@ -27,7 +27,7 @@ public:
   }
 
     // TODO: some better drawing utility stuff (wrap SDL_Renderer)
-  void draw(SDL_Renderer *renderer, Viewport &viewport);
+  void draw(SDL_Renderer *renderer, const Viewport &viewport);
 
   void set_velocity_setpoint(Vec2 velocity); // in m/s
   void set_angular_velocity_setpoint(float angular_velocity); // in rad/s
