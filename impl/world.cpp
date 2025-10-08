@@ -32,7 +32,7 @@ void draw_world_gridlines(SDL_Renderer *r, TTF_Font *font, const Viewport &vp) {
   float raw_spacing = target_px_spacing * units_per_px;
   float pow10 = powf(10.0f, floorf(log10f(raw_spacing)));
   float norm = raw_spacing / pow10;
-  float nice_factor = (norm < 2 ? 1 : (norm < 5 ? 2 : 5));
+  float nice_factor = (norm < 2 ? 1 : (norm < 10 ? 2 : 10));
   float grid_spacing = nice_factor * pow10;
 
   float left   = vp.center.x - vp.units_per_vw / 2.0f;
