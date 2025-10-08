@@ -8,6 +8,7 @@
 
 #include <spdlog/spdlog.h>
 #include "app.hpp"
+#include "world.hpp"
 
 namespace frc_pathgen {
 
@@ -23,6 +24,9 @@ App::App() : camera_controller(this->viewport) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
       spdlog::error("SDL could not initialize! SDL_Error: {}", SDL_GetError());
       return;
+    }
+    if (TTF_Init() == -1) {
+      spdlog::warn("SDL_TTF could not initialize! SDL_Error: {}", TTF_GetError());
     }
     inst_count++;
   }
@@ -40,6 +44,9 @@ App::App() : camera_controller(this->viewport) {
   this->renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
   this->viewport.width = WIDTH;
   this->viewport.height = HEIGHT;
+
+    // TODO: make this relative to exe dir
+  this->grid_font = TTF_OpenFont("assets/JetBrainsMono-Regular.ttf", 14);
 }
 
 void App::run() {
@@ -51,11 +58,7 @@ void App::run() {
   bool running = true;
   SDL_Event e;
 
-  Vec2 objects[] = {
-      {-1, -1}, {1, -1}, {-1, 1}, {1,1}
-  };
-
-  this->viewport.units_per_vw = 5.5;
+  this->viewport.units_per_vw = 250;
 
   while (running) {
     while (SDL_PollEvent(&e)) {
@@ -63,18 +66,14 @@ void App::run() {
       if (e.type == SDL_QUIT) running = false;
     }
 
-    SDL_SetRenderDrawColor(this->renderer, 100, 149, 237, 255);
-    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(this->renderer, 16, 16, 16, 255);
+    SDL_RenderClear(this->renderer);
 
+    draw_world_gridlines(this->renderer, this->grid_font, this->viewport);
 
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    for (auto& obj : objects) {
-        Vec2 px = this->viewport.world_to_px(obj);
-        SDL_Rect r{int(px.x - 5), int(px.y - 5), 10, 10};
-        SDL_RenderFillRect(renderer, &r);
-    }
+    this->robot.draw(this->renderer, this->viewport); // TODO: tick
 
-    SDL_RenderPresent(renderer);
+    SDL_RenderPresent(this->renderer);
   }
 
   this->teardown();

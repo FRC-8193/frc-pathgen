@@ -9,6 +9,7 @@
 #pragma once
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include "camera_controller.hpp"
 #include "robot.hpp"
 
@@ -26,8 +27,10 @@ private:
 
   SDL_Window *window;
   SDL_Renderer *renderer;
+  TTF_Font *grid_font;
   Viewport viewport;
 
   CameraController camera_controller;
+  Robot robot;
 };
 }

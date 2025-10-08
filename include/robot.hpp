@@ -26,10 +26,19 @@ public:
     return Vec2 { sinf(this->rotation_radians), -cosf(this->rotation_radians) };
   }
 
+    // TODO: some better drawing utility stuff (wrap SDL_Renderer)
   void draw(SDL_Renderer *renderer, Viewport &viewport);
+
+  void set_velocity_setpoint(Vec2 velocity); // in m/s
+  void set_angular_velocity_setpoint(float angular_velocity); // in rad/s
+  
+  void tick(float dt);
 private:
-  Vec2 frame_center;
-  float rotation_radians;
+  Vec2 frame_center = { 0,0 };
+  float rotation_radians = 0.0;
+
+  Vec2 velocity_setpoint;
+  float angular_velocity_setpoint;
 
   static constexpr float mass = 50.0; // kg
   static constexpr float wheelbase = 60.0; // cm (side length)
