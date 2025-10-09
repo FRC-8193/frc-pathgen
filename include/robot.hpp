@@ -12,6 +12,7 @@
 #include <SDL2/SDL.h>
 #include "vec2.hpp"
 #include "viewport.hpp"
+#include "pid.hpp"
 
 namespace frc_pathgen {
 
@@ -35,10 +36,18 @@ public:
   void tick(float dt);
 private:
   Vec2 frame_center = { 0,0 };
+  Vec2 velocity = { 0,0 };
   float rotation_radians = 0.0;
+  float angular_velocity = 0.0;
 
   Vec2 velocity_setpoint = { 0,0 };
+  PIDController<Vec2, float> velocity_pid { 1.0f, 0.0f, 0.0f };
+
   float angular_velocity_setpoint = 0.0;
+  PIDController<float> angular_velocity_pid { 5.0f, 0.1f, 0.0f };
+
+  // applies the given *wheel torques* (PID outputs)
+  void apply_torques(Vec2 xy_torque, float angular_torque, float dt);
 
   static constexpr float mass = 50.0; // kg
   static constexpr float wheelbase = 60.0; // cm (side length)

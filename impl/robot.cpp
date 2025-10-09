@@ -55,8 +55,29 @@ void Robot::set_angular_velocity_setpoint(float angular_velocity) {
 }
 
 void Robot::tick(float dt) {
-  // TODO: proper closed-loop control & physical maths
-  this->frame_center += this->velocity_setpoint * dt;
-  this->rotation_radians += this->angular_velocity_setpoint * dt;
+  Vec2 xy_pid = this->velocity_pid.update(this->velocity_setpoint, this->velocity, dt);
+  float r_pid = this->angular_velocity_pid.update(this->angular_velocity_setpoint, this->angular_velocity, dt);
+
+  this->apply_torques(xy_pid, r_pid, dt);
+
+  this->frame_center += this->velocity * dt;
+  this->rotation_radians += this->angular_velocity * dt;
+}
+
+void Robot::apply_torques(Vec2 xy, float r, float dt) {
+  Vec2 xy_wheel_percent = (xy / this->wheel_torque);
+  if (xy_wheel_percent.length() > 1.0f) {
+    xy_wheel_percent *= 1.0f / xy_wheel_percent.length();
+  }
+
+  Vec2 xy_robot_acceleration = xy_wheel_percent * this->bot_acceleration;
+
+  float r_wheel_percent = (r / this->wheel_torque);
+  if (abs(r_wheel_percent) > 1.0f) r_wheel_percent /= abs(r_wheel_percent);
+
+  float r_robot_acceleration = r_wheel_percent * this->bot_angular_acceleration;
+
+  this->velocity += xy_robot_acceleration * dt;
+  this->angular_velocity += r_robot_acceleration * dt;
 }
 }
