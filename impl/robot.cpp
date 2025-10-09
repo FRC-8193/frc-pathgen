@@ -7,7 +7,6 @@
 */
 
 #include "robot.hpp"
-#include "SDL_render.h"
 #include <cmath>
 #include <spdlog/spdlog.h>
 
@@ -52,10 +51,8 @@ void Robot::draw(SDL_Renderer *renderer, const Viewport &viewport) {
   Vec2 rp = viewport.world_to_px(this->frame_center + x*hs);
 
   Vec2 tvp = viewport.world_to_px(this->frame_center + this->velocity_setpoint*hs / this->velocity_setpoint.length());
-  Vec2 rvp = viewport.world_to_px(this->frame_center + this->velocity*hs / this->velocity_setpoint.length());
-  Vec2 pvp = viewport.world_to_px(this->frame_center + this->velocity_percent * this->velocity_setpoint*hs / this->velocity_setpoint.length());
-
-  Vec2 v_offs = Vec2 { tvp.y-cp.y, -(tvp.x-cp.x) } * 0.05;
+  Vec2 rvp = viewport.world_to_px(this->frame_center + this->velocity*hs / (this->velocity_setpoint.length() < .001?1:this->velocity_setpoint.length()));
+  Vec2 pvp = viewport.world_to_px(this->frame_center + this->velocity_percent*hs);
 
   SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
@@ -75,17 +72,17 @@ void Robot::draw(SDL_Renderer *renderer, const Viewport &viewport) {
 
 
   SDL_SetRenderDrawColor(renderer, 80, 255, 255, 255);
-  draw_arc(renderer, cp.x, cp.y, (fp-cp).length(), -this->rotation_radians, -(this->rotation_radians + (this->angular_velocity_setpoint < 0.0 ? -1.0 : 1.0)));
-  SDL_RenderDrawLineF(renderer, cp.x+v_offs.x, cp.y+v_offs.y, tvp.x+v_offs.x, tvp.y+v_offs.y);
+  if (abs(this->angular_velocity_setpoint) > .001) draw_arc(renderer, cp.x, cp.y, (fp-cp).length(), -this->rotation_radians, -(this->rotation_radians + (this->angular_velocity_setpoint < 0.0 ? -1.0 : 1.0)));
+  if (this->velocity_setpoint.length() > .001) SDL_RenderDrawLineF(renderer, cp.x, cp.y, tvp.x, tvp.y);
 
   SDL_SetRenderDrawColor(renderer, 255, 255, 80, 255);
   draw_arc(renderer, cp.x, cp.y, (fp-cp).length() * 0.975, -this->rotation_radians, -(this->rotation_radians + this->angular_velocity / abs(this->angular_velocity_setpoint)));
-  SDL_RenderDrawLineF(renderer, cp.x, cp.y, rvp.x, rvp.y);
+  if (this->velocity.length() > .001) SDL_RenderDrawLineF(renderer, cp.x, cp.y, rvp.x, rvp.y);
 
 
   SDL_SetRenderDrawColor(renderer, 255, 80, 255, 255);
   draw_arc(renderer, cp.x, cp.y, (fp-cp).length() * 0.95, -this->rotation_radians, -(this->rotation_radians + this->angular_velocity_percent));
-  SDL_RenderDrawLineF(renderer, cp.x-v_offs.x, cp.y-v_offs.y, pvp.x-v_offs.x, pvp.y-v_offs.y);
+  if (this->velocity_percent.length() > .001) SDL_RenderDrawLineF(renderer, cp.x, cp.y, pvp.x, pvp.y);
 }
 
 void Robot::set_velocity_setpoint(Vec2 velocity) {
@@ -96,6 +93,12 @@ void Robot::set_angular_velocity_setpoint(float angular_velocity) {
 }
 
 void Robot::tick(float dt) {
+  const Uint8 *keys = SDL_GetKeyboardState(nullptr);
+  this->velocity_setpoint.y = (keys[SDL_SCANCODE_W]?1:0) - (keys[SDL_SCANCODE_S]?1:0);
+  this->velocity_setpoint.x = (keys[SDL_SCANCODE_D]?1:0) - (keys[SDL_SCANCODE_A]?1:0);
+
+  this->angular_velocity_setpoint = (keys[SDL_SCANCODE_Q]?2:0) - (keys[SDL_SCANCODE_E]?2:0);
+  
   Vec2 xy_pid = this->velocity_pid.update(this->velocity_setpoint, this->velocity, dt);
   float r_pid = this->angular_velocity_pid.update(this->angular_velocity_setpoint, this->angular_velocity, dt);
 
@@ -103,6 +106,9 @@ void Robot::tick(float dt) {
 
   this->frame_center += this->velocity * dt;
   this->rotation_radians += this->angular_velocity * dt;
+
+  this->velocity *= expf(-.1 * dt);
+  this->angular_velocity *= expf(-.1 * dt);
 }
 
 void Robot::apply_voltages(Vec2 xy, float r, float dt) {
@@ -110,13 +116,13 @@ void Robot::apply_voltages(Vec2 xy, float r, float dt) {
   if (xy_wheel_percent.length() > 1.0f) {
     xy_wheel_percent *= 1.0f / xy_wheel_percent.length();
   }
-  this->velocity_percent = xy_wheel_percent.length();
+  this->velocity_percent = xy_wheel_percent;
 
   Vec2 xy_robot_acceleration = xy_wheel_percent * this->bot_acceleration;
 
   float r_wheel_percent = r / 12.0f;
   if (abs(r_wheel_percent) > 1.0f) r_wheel_percent /= abs(r_wheel_percent);
-  this->angular_velocity_percent = abs(r_wheel_percent);
+  this->angular_velocity_percent = r_wheel_percent;
 
   float r_robot_acceleration = r_wheel_percent * this->bot_angular_acceleration;
 

@@ -9,6 +9,7 @@
 #include "world.hpp"
 #include <cmath>
 #include <string>
+#include <spdlog/fmt/fmt.h>
 
 namespace frc_pathgen {
 
@@ -68,7 +69,7 @@ void draw_world_gridlines(SDL_Renderer *r, TTF_Font *font, const Viewport &vp) {
     // --- Label ---
     if (is_major && font && fabsf(x) > 1e-5f) {
       Vec2 label_pos = vp.world_to_px({x, 0});
-      draw_text(r, font, std::to_string((int)x), label_pos.x + 2, label_pos.y + 2);
+      draw_text(r, font, fmt::format("{:.2g}", x), label_pos.x + 2, label_pos.y + 2);
     }
   }
 
@@ -94,7 +95,7 @@ void draw_world_gridlines(SDL_Renderer *r, TTF_Font *font, const Viewport &vp) {
     // --- Label ---
     if (is_major && font && fabsf(y) > 1e-5f) {
       Vec2 label_pos = vp.world_to_px({0, y});
-      draw_text(r, font, std::to_string((int)y), label_pos.x + 4, label_pos.y + 4);
+      draw_text(r, font, fmt::format("{:.2g}", y), label_pos.x + 4, label_pos.y + 4);
     }
   }
 }
