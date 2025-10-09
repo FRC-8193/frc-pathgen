@@ -27,6 +27,10 @@ public:
     return Vec2 { sinf(this->rotation_radians), -cosf(this->rotation_radians) };
   }
 
+  inline Vec2 get_frame_center() const {
+    return this->frame_center;
+  }
+
     // TODO: some better drawing utility stuff (wrap SDL_Renderer)
   void draw(SDL_Renderer *renderer, const Viewport &viewport);
 
@@ -48,7 +52,9 @@ private:
   PIDController<float> angular_velocity_pid { 50.0f, 0.5f, 0.0f };
   float angular_velocity_percent = 0.0;
 
-  // applies the given *wheel torques* (PID outputs)
+  bool enable_keyboard_control = false;
+
+  // applies the given motor voltages (-12v-12v)
   void apply_voltages(Vec2 xy_voltage, float angular_voltage, float dt);
 
   static constexpr float mass = 50.0; // kg

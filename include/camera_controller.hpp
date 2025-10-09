@@ -10,18 +10,23 @@
 
 #include <SDL2/SDL.h>
 #include "viewport.hpp"
+#include "robot.hpp"
 
 namespace frc_pathgen {
 
 class CameraController {
 public:
-  CameraController(Viewport &viewport) : viewport(viewport) {
+  CameraController(Viewport &viewport, Robot *robot) : viewport(viewport), robot(robot) {
   }
 
+  void draw(SDL_Renderer *renderer, Viewport &viewport);
   bool consume_event(SDL_Event &e);
+  void tick(float dt);
 private:
   Viewport &viewport;
+  Robot *robot = nullptr;
+  bool follow_robot = false;
   bool mouse_down = false;
-  Vec2 last_mouse_pos;
+  Vec2 last_mouse_pos = {};
 };
 }

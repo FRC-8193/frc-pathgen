@@ -7,8 +7,16 @@
 */
 
 #include "camera_controller.hpp"
+#include <imgui.h>
+#include <iostream>
 
 namespace frc_pathgen {
+
+void CameraController::draw(SDL_Renderer *renderer, Viewport &viewport) {
+  ImGui::Begin("Camera Controls");
+  ImGui::Checkbox("Follow Robot", &this->follow_robot);
+  ImGui::End();
+}
 
 bool CameraController::consume_event(SDL_Event &e) {
   switch (e.type) {
@@ -34,8 +42,10 @@ bool CameraController::consume_event(SDL_Event &e) {
 
     float units_per_px = this->viewport.units_per_vw / this->viewport.width;
 
-    this->viewport.center.x -= dx * units_per_px; 
-    this->viewport.center.y += dy * units_per_px;
+    if (!this->follow_robot || this->robot == nullptr) {
+      this->viewport.center.x -= dx * units_per_px; 
+      this->viewport.center.y += dy * units_per_px;
+    }
     return true; }
   case SDL_MOUSEWHEEL: {
     if (e.wheel.y == 0) return false;
@@ -50,11 +60,17 @@ bool CameraController::consume_event(SDL_Event &e) {
 
     Vec2 post_world = this->viewport.px_to_world(mouse);
 
-    this->viewport.center += pre_world - post_world;
+    if (!this->follow_robot || this->robot == nullptr) this->viewport.center += pre_world - post_world;
 
     return true; }
   default:
     return false;
+  }
+}
+
+void CameraController::tick(float dt) {
+  if (this->follow_robot && this->robot != nullptr) {
+    this->viewport.center = this->robot->get_frame_center();
   }
 }
 }

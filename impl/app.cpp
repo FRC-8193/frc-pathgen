@@ -7,6 +7,9 @@
 */
 
 #include <spdlog/spdlog.h>
+#include <imgui.h>
+#include <backends/imgui_impl_sdl2.h>
+#include <backends/imgui_impl_sdlrenderer2.h>
 #include "app.hpp"
 #include "SDL_timer.h"
 #include "world.hpp"
@@ -16,20 +19,17 @@ namespace frc_pathgen {
 static const unsigned int WIDTH  = 1920;
 static const unsigned int HEIGHT = 1080;
 
-static int inst_count = 0;
-
-App::App() : camera_controller(this->viewport), robot() {
+App::App() : robot(), camera_controller(this->viewport, &this->robot) {
   this->window = nullptr;
 
-  if (inst_count == 0) {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-      spdlog::error("SDL could not initialize! SDL_Error: {}", SDL_GetError());
-      return;
-    }
-    if (TTF_Init() == -1) {
-      spdlog::warn("SDL_TTF could not initialize! SDL_Error: {}", TTF_GetError());
-    }
-    inst_count++;
+  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+    spdlog::error("SDL could not initialize! SDL_Error: {}", SDL_GetError());
+    return;
+  }
+  
+
+  if (TTF_Init() == -1) {
+    spdlog::warn("SDL_TTF could not initialize! SDL_Error: {}", TTF_GetError());
   }
 
   this->window = SDL_CreateWindow("frc-pathgen",
@@ -45,6 +45,14 @@ App::App() : camera_controller(this->viewport), robot() {
   this->renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
   this->viewport.width = WIDTH;
   this->viewport.height = HEIGHT;
+
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGui::StyleColorsDark();
+
+  // SDL window + SDL_Renderer
+  ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
+  ImGui_ImplSDLRenderer2_Init(renderer);
 
     // TODO: make this relative to exe dir
   this->grid_font = TTF_OpenFont("assets/JetBrainsMono-Regular.ttf", 14);
@@ -79,13 +87,18 @@ void App::run() {
       spdlog::info("{}fps", (int)(1.0 / dt));
     }
 
+    ImGuiIO &io = ImGui::GetIO();
+
     while (SDL_PollEvent(&e)) {
+      ImGui_ImplSDL2_ProcessEvent(&e);
+      if (io.WantCaptureKeyboard || io.WantCaptureMouse) continue;
       if (this->camera_controller.consume_event(e)) continue;
       if (e.type == SDL_QUIT) running = false;
     }
 
     // Physics stuff
     this->robot.tick(dt);
+    this->camera_controller.tick(dt);
 
     // Rendering
 
@@ -94,7 +107,16 @@ void App::run() {
 
     draw_world_gridlines(this->renderer, this->grid_font, this->viewport);
 
-    this->robot.draw(this->renderer, this->viewport); // TODO: tick
+    
+    ImGui_ImplSDLRenderer2_NewFrame();
+    ImGui_ImplSDL2_NewFrame();
+    ImGui::NewFrame();
+
+    this->robot.draw(this->renderer, this->viewport);
+    this->camera_controller.draw(this->renderer, this->viewport);
+
+    ImGui::Render();
+    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), this->renderer);
 
     SDL_RenderPresent(this->renderer);
   }
@@ -106,8 +128,6 @@ void App::teardown() {
   if (!this->is_ok()) return;
   SDL_DestroyRenderer(this->renderer);
   SDL_DestroyWindow(this->window);
-  if ((--inst_count) == 0) {
-    SDL_Quit();
-  }
+  SDL_Quit();
 }
 }

@@ -19,6 +19,8 @@ endif()
 add_subdirectory(${CMAKE_SOURCE_DIR}/impl)
 add_subdirectory(${CMAKE_SOURCE_DIR}/extern/spdlog)
 
+include(imgui.cmake)
+
 add_executable(frc-pathgen ${FRC_PATHGEN_SOURCES})
 target_include_directories(frc-pathgen PRIVATE ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(frc-pathgen PRIVATE ${SDL2_LIBRARIES} ${SDL2TTF_LIBRARIES} spdlog::spdlog)
+target_link_libraries(frc-pathgen PRIVATE ${SDL2_LIBRARIES} ${SDL2TTF_LIBRARIES} spdlog::spdlog ImGui)

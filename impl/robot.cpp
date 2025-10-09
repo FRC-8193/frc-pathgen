@@ -9,6 +9,7 @@
 #include "robot.hpp"
 #include <cmath>
 #include <spdlog/spdlog.h>
+#include <imgui.h>
 
 namespace frc_pathgen {
 
@@ -83,6 +84,10 @@ void Robot::draw(SDL_Renderer *renderer, const Viewport &viewport) {
   SDL_SetRenderDrawColor(renderer, 255, 80, 255, 255);
   draw_arc(renderer, cp.x, cp.y, (fp-cp).length() * 0.95, -this->rotation_radians, -(this->rotation_radians + this->angular_velocity_percent));
   if (this->velocity_percent.length() > .001) SDL_RenderDrawLineF(renderer, cp.x, cp.y, pvp.x, pvp.y);
+
+  ImGui::Begin("Robot controls");
+  ImGui::Checkbox("Enable Keyboard", &this->enable_keyboard_control);
+  ImGui::End();
 }
 
 void Robot::set_velocity_setpoint(Vec2 velocity) {
@@ -93,11 +98,13 @@ void Robot::set_angular_velocity_setpoint(float angular_velocity) {
 }
 
 void Robot::tick(float dt) {
-  const Uint8 *keys = SDL_GetKeyboardState(nullptr);
-  this->velocity_setpoint.y = (keys[SDL_SCANCODE_W]?1:0) - (keys[SDL_SCANCODE_S]?1:0);
-  this->velocity_setpoint.x = (keys[SDL_SCANCODE_D]?1:0) - (keys[SDL_SCANCODE_A]?1:0);
+  if (this->enable_keyboard_control) {
+    const Uint8 *keys = SDL_GetKeyboardState(nullptr);
+    this->velocity_setpoint.y = (keys[SDL_SCANCODE_W]?1:0) - (keys[SDL_SCANCODE_S]?1:0);
+    this->velocity_setpoint.x = (keys[SDL_SCANCODE_D]?1:0) - (keys[SDL_SCANCODE_A]?1:0);
 
-  this->angular_velocity_setpoint = (keys[SDL_SCANCODE_Q]?2:0) - (keys[SDL_SCANCODE_E]?2:0);
+    this->angular_velocity_setpoint = (keys[SDL_SCANCODE_Q]?2:0) - (keys[SDL_SCANCODE_E]?2:0);
+  }
   
   Vec2 xy_pid = this->velocity_pid.update(this->velocity_setpoint, this->velocity, dt);
   float r_pid = this->angular_velocity_pid.update(this->angular_velocity_setpoint, this->angular_velocity, dt);

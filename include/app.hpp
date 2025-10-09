@@ -30,7 +30,7 @@ private:
   TTF_Font *grid_font;
   Viewport viewport;
 
-  CameraController camera_controller;
   Robot robot;
+  CameraController camera_controller;
 };
 }
