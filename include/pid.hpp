@@ -10,6 +10,8 @@
 
 template<typename T, typename K=T>
 struct PIDController {
+  PIDController(K kP, K kI, K kD) : kP(kP), kI(kI), kD(kD) {}
+
   K kP, kI, kD;
 
   T update(const T &target, const T &current, float dt) {
