@@ -51,8 +51,8 @@ void Robot::draw(SDL_Renderer *renderer, const Viewport &viewport) {
   Vec2 fp = viewport.world_to_px(this->frame_center + y*hs);
   Vec2 rp = viewport.world_to_px(this->frame_center + x*hs);
 
-  Vec2 tvp = viewport.world_to_px(this->frame_center + this->velocity_setpoint*hs / this->velocity_setpoint.length());
-  Vec2 rvp = viewport.world_to_px(this->frame_center + this->velocity*hs / (this->velocity_setpoint.length() < .001?1:this->velocity_setpoint.length()));
+  Vec2 tvp = viewport.world_to_px(this->frame_center + this->velocity_setpoint);
+  Vec2 rvp = viewport.world_to_px(this->frame_center + this->velocity);
   Vec2 pvp = viewport.world_to_px(this->frame_center + this->velocity_percent*hs);
 
   SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -73,11 +73,11 @@ void Robot::draw(SDL_Renderer *renderer, const Viewport &viewport) {
 
 
   SDL_SetRenderDrawColor(renderer, 80, 255, 255, 255);
-  if (abs(this->angular_velocity_setpoint) > .001) draw_arc(renderer, cp.x, cp.y, (fp-cp).length(), -this->rotation_radians, -(this->rotation_radians + (this->angular_velocity_setpoint < 0.0 ? -1.0 : 1.0)));
+  draw_arc(renderer, cp.x, cp.y, (fp-cp).length(), -this->rotation_radians, -(this->rotation_radians + this->angular_velocity_setpoint));
   if (this->velocity_setpoint.length() > .001) SDL_RenderDrawLineF(renderer, cp.x, cp.y, tvp.x, tvp.y);
 
   SDL_SetRenderDrawColor(renderer, 255, 255, 80, 255);
-  draw_arc(renderer, cp.x, cp.y, (fp-cp).length() * 0.975, -this->rotation_radians, -(this->rotation_radians + this->angular_velocity / abs(this->angular_velocity_setpoint)));
+  draw_arc(renderer, cp.x, cp.y, (fp-cp).length() * 0.975, -this->rotation_radians, -(this->rotation_radians + this->angular_velocity));
   if (this->velocity.length() > .001) SDL_RenderDrawLineF(renderer, cp.x, cp.y, rvp.x, rvp.y);
 
 
