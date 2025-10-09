@@ -8,16 +8,25 @@
 
 #pragma once
 
+#include <cmath>
+
 namespace frc_pathgen {
 
 struct Vec2 {
   float x, y;
 
-  Vec2 operator+(const Vec2& o) const { return {x + o.x, y + o.y}; }
-  Vec2 operator-(const Vec2& o) const { return {x - o.x, y - o.y}; }
-  Vec2 operator*(float f) const { return {x * f, y * f}; }
-  Vec2 operator/(float f) const { return {x / f, y / f}; }
-  Vec2& operator+=(const Vec2& o) { x += o.x; y += o.y; return *this; }
-  Vec2& operator-=(const Vec2& o) { x -= o.x; y -= o.y; return *this; }
+  inline float length() const { return sqrtf(x*x+y*y); }
+
+  inline Vec2 operator+(const Vec2& o) const { return {x + o.x, y + o.y}; }
+  inline Vec2 operator-(const Vec2& o) const { return {x - o.x, y - o.y}; }
+  inline Vec2 operator*(float f) const { return {x * f, y * f}; }
+  inline Vec2 operator/(float f) const { return {x / f, y / f}; }
+  inline Vec2& operator+=(const Vec2& o) { x += o.x; y += o.y; return *this; }
+  inline Vec2& operator-=(const Vec2& o) { x -= o.x; y -= o.y; return *this; }
+  inline Vec2& operator*=(const float& o) { x *= o; y *= o; return *this; }
 };
+
+inline Vec2 operator*(float a, const Vec2& b) {
+  return b*a;
+}
 }
