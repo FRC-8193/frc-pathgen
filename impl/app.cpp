@@ -34,7 +34,7 @@ App::App() : robot(), camera_controller(this->viewport, &this->robot) {
 
   this->window = SDL_CreateWindow("frc-pathgen",
     SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-    WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+    WIDTH, HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 
   if (!this->window) {
     spdlog::error("Window could not be created! SDL_Error: {}", SDL_GetError());
@@ -93,6 +93,17 @@ void App::run() {
       ImGui_ImplSDL2_ProcessEvent(&e);
       if (io.WantCaptureKeyboard || io.WantCaptureMouse) continue;
       if (this->camera_controller.consume_event(e)) continue;
+      if (e.type == SDL_WINDOWEVENT &&
+        e.window.event == SDL_WINDOWEVENT_RESIZED) {
+        int w = e.window.data1;
+        int h = e.window.data2;
+
+        SDL_RenderSetLogicalSize(renderer, w, h);
+        SDL_RenderSetViewport(renderer, NULL);
+
+        this->viewport.width = w;
+        this->viewport.height = h;
+      }
       if (e.type == SDL_QUIT) running = false;
     }
 
