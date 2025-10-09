@@ -45,7 +45,7 @@ private:
   float angular_velocity = 0.0;
 
   Vec2 velocity_setpoint = { 0,0 };
-  PIDController<Vec2, float> velocity_pid { 50.0f, 2.5f, 0.4f };
+  PIDController<Vec2, float> velocity_pid { 50.0f, 0.0f, 0.4f };
   Vec2 velocity_percent = { 0,0 };
 
   float angular_velocity_setpoint = 0.0;
@@ -62,7 +62,7 @@ private:
   static constexpr float wheel_dist = 42.0; // cm
   static constexpr float moi = 3.0; // kg-m^2
 
-  static constexpr float wheel_torque = 35.0; // Ncm
+  static constexpr float wheel_torque = 70.0; // Ncm
   static constexpr float wheel_radius = 4.375; // cm
  
   static constexpr float wheel_torque_m = wheel_torque / 100.0f; // Nm
