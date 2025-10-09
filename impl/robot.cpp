@@ -11,6 +11,22 @@
 
 namespace frc_pathgen {
 
+static void draw_arc(SDL_Renderer *r, int cx, int cy, float radius,
+              float start_angle, float end_angle, int segments = 64) {
+  float step = (end_angle - start_angle) / segments;
+  for (int i = 0; i < segments; i++) {
+    float a0 = start_angle + i * step;
+    float a1 = a0 + step;
+
+    int x0 = cx + (int)(cosf(a0) * radius);
+    int y0 = cy + (int)(sinf(a0) * radius);
+    int x1 = cx + (int)(cosf(a1) * radius);
+    int y1 = cy + (int)(sinf(a1) * radius);
+
+    SDL_RenderDrawLine(r, x0, y0, x1, y1);
+  }
+}
+
 void Robot::draw(SDL_Renderer *renderer, const Viewport &viewport) {
   float hs = this->wheelbase / 2.0;
   Vec2 y = this->forward();
@@ -45,6 +61,12 @@ void Robot::draw(SDL_Renderer *renderer, const Viewport &viewport) {
 
   SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
   SDL_RenderDrawPointF(renderer, cp.x, cp.y);
+
+  SDL_SetRenderDrawColor(renderer, 80, 255, 255, 255);
+  draw_arc(renderer, cp.x, cp.y, (fp-cp).length(), -this->rotation_radians, -(this->rotation_radians + this->angular_velocity_setpoint));
+
+  SDL_SetRenderDrawColor(renderer, 255, 255, 80, 255);
+  draw_arc(renderer, cp.x, cp.y, (fp-cp).length() * 0.95, -this->rotation_radians, -(this->rotation_radians + this->angular_velocity));
 }
 
 void Robot::set_velocity_setpoint(Vec2 velocity) {
@@ -58,21 +80,21 @@ void Robot::tick(float dt) {
   Vec2 xy_pid = this->velocity_pid.update(this->velocity_setpoint, this->velocity, dt);
   float r_pid = this->angular_velocity_pid.update(this->angular_velocity_setpoint, this->angular_velocity, dt);
 
-  this->apply_torques(xy_pid, r_pid, dt);
+  this->apply_voltages(xy_pid, r_pid, dt);
 
   this->frame_center += this->velocity * dt;
   this->rotation_radians += this->angular_velocity * dt;
 }
 
-void Robot::apply_torques(Vec2 xy, float r, float dt) {
-  Vec2 xy_wheel_percent = (xy / this->wheel_torque);
+void Robot::apply_voltages(Vec2 xy, float r, float dt) {
+  Vec2 xy_wheel_percent = xy / 12.0f;
   if (xy_wheel_percent.length() > 1.0f) {
     xy_wheel_percent *= 1.0f / xy_wheel_percent.length();
   }
 
   Vec2 xy_robot_acceleration = xy_wheel_percent * this->bot_acceleration;
 
-  float r_wheel_percent = (r / this->wheel_torque);
+  float r_wheel_percent = r / 12.0f;
   if (abs(r_wheel_percent) > 1.0f) r_wheel_percent /= abs(r_wheel_percent);
 
   float r_robot_acceleration = r_wheel_percent * this->bot_angular_acceleration;

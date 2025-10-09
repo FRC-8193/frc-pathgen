@@ -47,7 +47,7 @@ private:
   PIDController<float> angular_velocity_pid { 5.0f, 0.1f, 0.0f };
 
   // applies the given *wheel torques* (PID outputs)
-  void apply_torques(Vec2 xy_torque, float angular_torque, float dt);
+  void apply_voltages(Vec2 xy_voltage, float angular_voltage, float dt);
 
   static constexpr float mass = 50.0; // kg
   static constexpr float wheelbase = 60.0; // cm (side length)
