@@ -52,6 +52,7 @@ App::App() : camera_controller(this->viewport), robot() {
 
 void App::run() {
   this->robot.set_angular_velocity_setpoint(1);
+  this->robot.set_velocity_setpoint({0, 1});
   if (!this->is_ok()) {
     spdlog::error("Attepmted to run an App in an invalid state!");
     return;
@@ -60,10 +61,12 @@ void App::run() {
   bool running = true;
   SDL_Event e;
 
-  this->viewport.units_per_vw = 500;
+  this->viewport.units_per_vw = 5;
 
   Uint64 perf_freq = SDL_GetPerformanceFrequency();
   Uint64 last_time = SDL_GetPerformanceCounter();
+  
+  Uint64 print_time = last_time;
 
   while (running) {
     Uint64 time = SDL_GetPerformanceCounter();
@@ -71,7 +74,10 @@ void App::run() {
     float dt = (float)(time - last_time) / perf_freq; // seconds
     last_time = time;
    
-    spdlog::info("{}", dt);
+    if ((time - print_time) / perf_freq > 1.0) {
+      print_time = time;
+      spdlog::info("{}fps", (int)(1.0 / dt));
+    }
 
     while (SDL_PollEvent(&e)) {
       if (this->camera_controller.consume_event(e)) continue;

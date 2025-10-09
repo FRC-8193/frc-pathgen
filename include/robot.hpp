@@ -41,10 +41,12 @@ private:
   float angular_velocity = 0.0;
 
   Vec2 velocity_setpoint = { 0,0 };
-  PIDController<Vec2, float> velocity_pid { 1.0f, 0.0f, 0.0f };
+  PIDController<Vec2, float> velocity_pid { 50.0f, 1.0f, 0.2f };
+  float velocity_percent = 0.0;
 
   float angular_velocity_setpoint = 0.0;
-  PIDController<float> angular_velocity_pid { 5.0f, 0.1f, 0.0f };
+  PIDController<float> angular_velocity_pid { 50.0f, 0.5f, 0.0f };
+  float angular_velocity_percent = 0.0;
 
   // applies the given *wheel torques* (PID outputs)
   void apply_voltages(Vec2 xy_voltage, float angular_voltage, float dt);
@@ -60,6 +62,7 @@ private:
   static constexpr float wheel_torque_m = wheel_torque / 100.0f; // Nm
   static constexpr float wheel_radius_m = wheel_radius / 100.0f; // m
   static constexpr float wheel_dist_m   = wheel_dist / 100.0f;   // m
+  static constexpr float wheelbase_m    = wheelbase  / 100.0f;   // m
 
   static constexpr float wheel_ground_force = wheel_torque_m / wheel_radius_m; // N
   static constexpr float wheel_ground_torque = wheel_ground_force * wheel_dist_m; // Nm

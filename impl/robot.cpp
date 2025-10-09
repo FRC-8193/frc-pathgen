@@ -8,11 +8,16 @@
 
 #include "robot.hpp"
 #include "SDL_render.h"
+#include <cmath>
+#include <spdlog/spdlog.h>
 
 namespace frc_pathgen {
 
 static void draw_arc(SDL_Renderer *r, int cx, int cy, float radius,
               float start_angle, float end_angle, int segments = 64) {
+
+  if (abs(start_angle - end_angle) < .01) return;
+
   float step = (end_angle - start_angle) / segments;
   for (int i = 0; i < segments; i++) {
     float a0 = start_angle + i * step;
@@ -28,7 +33,7 @@ static void draw_arc(SDL_Renderer *r, int cx, int cy, float radius,
 }
 
 void Robot::draw(SDL_Renderer *renderer, const Viewport &viewport) {
-  float hs = this->wheelbase / 2.0;
+  float hs = this->wheelbase_m / 2.0;
   Vec2 y = this->forward();
   Vec2 x = this->right();
 
@@ -46,6 +51,12 @@ void Robot::draw(SDL_Renderer *renderer, const Viewport &viewport) {
   Vec2 fp = viewport.world_to_px(this->frame_center + y*hs);
   Vec2 rp = viewport.world_to_px(this->frame_center + x*hs);
 
+  Vec2 tvp = viewport.world_to_px(this->frame_center + this->velocity_setpoint*hs / this->velocity_setpoint.length());
+  Vec2 rvp = viewport.world_to_px(this->frame_center + this->velocity*hs / this->velocity_setpoint.length());
+  Vec2 pvp = viewport.world_to_px(this->frame_center + this->velocity_percent * this->velocity_setpoint*hs / this->velocity_setpoint.length());
+
+  Vec2 v_offs = Vec2 { tvp.y-cp.y, -(tvp.x-cp.x) } * 0.05;
+
   SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
   SDL_RenderDrawLineF(renderer, flp.x, flp.y, frp.x, frp.y);
@@ -62,11 +73,19 @@ void Robot::draw(SDL_Renderer *renderer, const Viewport &viewport) {
   SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
   SDL_RenderDrawPointF(renderer, cp.x, cp.y);
 
+
   SDL_SetRenderDrawColor(renderer, 80, 255, 255, 255);
-  draw_arc(renderer, cp.x, cp.y, (fp-cp).length(), -this->rotation_radians, -(this->rotation_radians + this->angular_velocity_setpoint));
+  draw_arc(renderer, cp.x, cp.y, (fp-cp).length(), -this->rotation_radians, -(this->rotation_radians + (this->angular_velocity_setpoint < 0.0 ? -1.0 : 1.0)));
+  SDL_RenderDrawLineF(renderer, cp.x+v_offs.x, cp.y+v_offs.y, tvp.x+v_offs.x, tvp.y+v_offs.y);
 
   SDL_SetRenderDrawColor(renderer, 255, 255, 80, 255);
-  draw_arc(renderer, cp.x, cp.y, (fp-cp).length() * 0.95, -this->rotation_radians, -(this->rotation_radians + this->angular_velocity));
+  draw_arc(renderer, cp.x, cp.y, (fp-cp).length() * 0.975, -this->rotation_radians, -(this->rotation_radians + this->angular_velocity / abs(this->angular_velocity_setpoint)));
+  SDL_RenderDrawLineF(renderer, cp.x, cp.y, rvp.x, rvp.y);
+
+
+  SDL_SetRenderDrawColor(renderer, 255, 80, 255, 255);
+  draw_arc(renderer, cp.x, cp.y, (fp-cp).length() * 0.95, -this->rotation_radians, -(this->rotation_radians + this->angular_velocity_percent));
+  SDL_RenderDrawLineF(renderer, cp.x-v_offs.x, cp.y-v_offs.y, pvp.x-v_offs.x, pvp.y-v_offs.y);
 }
 
 void Robot::set_velocity_setpoint(Vec2 velocity) {
@@ -91,11 +110,13 @@ void Robot::apply_voltages(Vec2 xy, float r, float dt) {
   if (xy_wheel_percent.length() > 1.0f) {
     xy_wheel_percent *= 1.0f / xy_wheel_percent.length();
   }
+  this->velocity_percent = xy_wheel_percent.length();
 
   Vec2 xy_robot_acceleration = xy_wheel_percent * this->bot_acceleration;
 
   float r_wheel_percent = r / 12.0f;
   if (abs(r_wheel_percent) > 1.0f) r_wheel_percent /= abs(r_wheel_percent);
+  this->angular_velocity_percent = abs(r_wheel_percent);
 
   float r_robot_acceleration = r_wheel_percent * this->bot_angular_acceleration;
 
