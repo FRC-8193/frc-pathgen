@@ -6,6 +6,7 @@ set(FRC_PATHGEN_SOURCES
   ${CMAKE_CURRENT_LIST_DIR}/world.cpp
   ${CMAKE_CURRENT_LIST_DIR}/gfx.cpp
   ${CMAKE_CURRENT_LIST_DIR}/path_follower.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/path.cpp
 
   PARENT_SCOPE)
 

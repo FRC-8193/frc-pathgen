@@ -39,4 +39,11 @@ void draw_arc(SDL_Renderer *r, int cx, int cy, float radius,
     SDL_RenderDrawLine(r, x0, y0, x1, y1);
   }
 }
+
+void draw_filled_circle(SDL_Renderer *r, int cx, int cy, int radius) {
+  for (int dy = -radius; dy <= radius; dy++) {
+    int dx = (int)std::sqrt(radius * radius - dy * dy);
+    SDL_RenderDrawLine(r, cx - dx, cy + dy, cx + dx, cy + dy);
+  }
+}
 }

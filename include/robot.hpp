@@ -61,7 +61,7 @@ private:
 
   // applies the given motor voltages (-12v-12v)
   void apply_voltages(Vec2 xy_voltage, float angular_voltage, float dt);
-
+public:
   static constexpr float mass = 50.0; // kg
   static constexpr float wheelbase = 60.0; // cm (side length)
   static constexpr float wheel_dist = 42.0; // cm

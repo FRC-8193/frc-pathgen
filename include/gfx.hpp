@@ -16,4 +16,5 @@ namespace frc_pathgen {
 void draw_text(SDL_Renderer *r, TTF_Font *font, const std::string &text, float x, float y);
 void draw_arc(SDL_Renderer *r, int cx, int cy, float radius,
               float start_angle, float end_angle, int segments = 64);
+void draw_filled_circle(SDL_Renderer *r, int cx, int cy, int radius);
 }

@@ -13,6 +13,7 @@
 #include "camera_controller.hpp"
 #include "robot.hpp"
 #include "path_follower.hpp"
+#include "path.hpp"
 
 namespace frc_pathgen {
 
@@ -35,5 +36,6 @@ private:
   Robot robot;
   CameraController camera_controller;
   PathFollower path_follower;
+  LinePath path;
 };
 }

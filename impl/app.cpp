@@ -22,7 +22,7 @@ namespace frc_pathgen {
 static const unsigned int WIDTH  = 1920;
 static const unsigned int HEIGHT = 1080;
 
-App::App() : robot(), camera_controller(this->viewport, &this->robot), path_follower(this->robot) {
+App::App() : robot(), camera_controller(this->viewport, &this->robot), path_follower(this->robot), path({0,0},{1,2}) {
   this->window = nullptr;
 
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -48,6 +48,8 @@ App::App() : robot(), camera_controller(this->viewport, &this->robot), path_foll
   this->renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
   this->viewport.width = WIDTH;
   this->viewport.height = HEIGHT;
+
+  this->path_follower.set_path(this->path);
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -105,6 +107,7 @@ void App::run() {
       ImGui_ImplSDL2_ProcessEvent(&e);
       if (io.WantCaptureKeyboard || io.WantCaptureMouse) continue;
       if (this->camera_controller.consume_event(e)) continue;
+      if (this->path.consume_event(e)) continue;
       if (e.type == SDL_WINDOWEVENT &&
         e.window.event == SDL_WINDOWEVENT_RESIZED) {
         int w = e.window.data1;
@@ -137,7 +140,8 @@ void App::run() {
     this->robot.draw(this->renderer, this->viewport);
     this->camera_controller.draw(this->renderer, this->viewport);
     this->path_follower.draw(this->renderer, this->viewport);
-
+    this->path.draw(this->renderer, this->viewport);
+    
     SDL_SetRenderDrawColor(this->renderer, 128, 128, 128, 255);
     draw_text(this->renderer, this->fps_font, std::to_string((int)fps), 14, 14);
     
