@@ -10,9 +10,12 @@
 #include <imgui.h>
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_sdlrenderer2.h>
+#include <filesystem>
 #include "app.hpp"
+#include "SDL_render.h"
 #include "SDL_timer.h"
 #include "world.hpp"
+#include "gfx.hpp"
 
 namespace frc_pathgen {
 
@@ -54,8 +57,16 @@ App::App() : robot(), camera_controller(this->viewport, &this->robot) {
   ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
   ImGui_ImplSDLRenderer2_Init(renderer);
 
+  char *exedir = SDL_GetBasePath();
+
+  auto font_path = std::filesystem::path(exedir) / "resources/JetBrainsMono-Regular.ttf";
+
+  spdlog::info("{}", font_path.c_str());
+
+  SDL_free(exedir);
     // TODO: make this relative to exe dir
-  this->grid_font = TTF_OpenFont("assets/JetBrainsMono-Regular.ttf", 14);
+  this->grid_font = TTF_OpenFont(font_path.c_str(), 14);
+  this->fps_font  = TTF_OpenFont(font_path.c_str(), 28);
 }
 
 void App::run() {
@@ -74,18 +85,15 @@ void App::run() {
   Uint64 perf_freq = SDL_GetPerformanceFrequency();
   Uint64 last_time = SDL_GetPerformanceCounter();
   
-  Uint64 print_time = last_time;
+  double fps = 60.0;
 
   while (running) {
     Uint64 time = SDL_GetPerformanceCounter();
 
     float dt = (float)(time - last_time) / perf_freq; // seconds
     last_time = time;
-   
-    if ((time - print_time) / perf_freq > 1.0) {
-      print_time = time;
-      spdlog::info("{}fps", (int)(1.0 / dt));
-    }
+
+    fps = (1.0-dt) * fps + dt * (1.0 / dt);
 
     ImGuiIO &io = ImGui::GetIO();
 
@@ -112,7 +120,6 @@ void App::run() {
     this->camera_controller.tick(dt);
 
     // Rendering
-
     SDL_SetRenderDrawColor(this->renderer, 16, 16, 16, 255);
     SDL_RenderClear(this->renderer);
 
@@ -126,6 +133,9 @@ void App::run() {
     this->robot.draw(this->renderer, this->viewport);
     this->camera_controller.draw(this->renderer, this->viewport);
 
+    SDL_SetRenderDrawColor(this->renderer, 128, 128, 128, 255);
+    draw_text(this->renderer, this->fps_font, std::to_string((int)fps), 14, 14);
+    
     ImGui::Render();
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), this->renderer);
 

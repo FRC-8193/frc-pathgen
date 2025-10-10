@@ -28,6 +28,7 @@ private:
   SDL_Window *window;
   SDL_Renderer *renderer;
   TTF_Font *grid_font;
+  TTF_Font *fps_font;
   Viewport viewport;
 
   Robot robot;

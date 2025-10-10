@@ -7,30 +7,12 @@
 */
 
 #include "robot.hpp"
+#include "gfx.hpp"
 #include <cmath>
 #include <spdlog/spdlog.h>
 #include <imgui.h>
 
 namespace frc_pathgen {
-
-static void draw_arc(SDL_Renderer *r, int cx, int cy, float radius,
-              float start_angle, float end_angle, int segments = 64) {
-
-  if (abs(start_angle - end_angle) < .01) return;
-
-  float step = (end_angle - start_angle) / segments;
-  for (int i = 0; i < segments; i++) {
-    float a0 = start_angle + i * step;
-    float a1 = a0 + step;
-
-    int x0 = cx + (int)(cosf(a0) * radius);
-    int y0 = cy + (int)(sinf(a0) * radius);
-    int x1 = cx + (int)(cosf(a1) * radius);
-    int y1 = cy + (int)(sinf(a1) * radius);
-
-    SDL_RenderDrawLine(r, x0, y0, x1, y1);
-  }
-}
 
 void Robot::draw(SDL_Renderer *renderer, const Viewport &viewport) {
   float hs = this->wheelbase_m / 2.0;

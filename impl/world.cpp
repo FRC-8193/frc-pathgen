@@ -7,23 +7,11 @@
 */
 
 #include "world.hpp"
+#include "gfx.hpp"
 #include <cmath>
-#include <string>
 #include <spdlog/fmt/fmt.h>
 
 namespace frc_pathgen {
-
-// Simple helper for text rendering
-void draw_text(SDL_Renderer *r, TTF_Font *font, const std::string &text, float x, float y) {
-  if (!font) return;
-  SDL_Color color = {200, 200, 200, 255};
-  SDL_Surface *surf = TTF_RenderText_Blended(font, text.c_str(), color);
-  SDL_Texture *tex = SDL_CreateTextureFromSurface(r, surf);
-  SDL_Rect dst = {(int)x, (int)y, surf->w, surf->h};
-  SDL_RenderCopy(r, tex, nullptr, &dst);
-  SDL_FreeSurface(surf);
-  SDL_DestroyTexture(tex);
-}
 
 void draw_world_gridlines(SDL_Renderer *r, TTF_Font *font, const Viewport &vp) {
   float units_per_px = vp.units_per_vw / vp.width;
