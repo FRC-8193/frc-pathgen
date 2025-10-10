@@ -23,7 +23,7 @@ static const unsigned int WIDTH  = 1920;
 static const unsigned int HEIGHT = 1080;
 
 App::App() : robot(), camera_controller(this->viewport, &this->robot), path_follower(this->robot), 
-  path({0,0},{0,6},{1,3},{1,-2}) {
+  path({0,0},{0,6},{1,3},{1,5}) {
   this->window = nullptr;
 
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
