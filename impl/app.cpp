@@ -58,15 +58,19 @@ App::App() : robot(), camera_controller(this->viewport, &this->robot) {
   ImGui_ImplSDLRenderer2_Init(renderer);
 
   char *exedir = SDL_GetBasePath();
+  char *usrdir = SDL_GetPrefPath("FRC-8193", "frc-pathgen");
 
   auto font_path = std::filesystem::path(exedir) / "resources/JetBrainsMono-Regular.ttf";
+  static auto imgui_ini_path = std::filesystem::path(usrdir) / "imgui.ini";
 
-  spdlog::info("{}", font_path.c_str());
-
+  spdlog::info("{}", imgui_ini_path.c_str());
+  SDL_free(usrdir);
   SDL_free(exedir);
-    // TODO: make this relative to exe dir
+
   this->grid_font = TTF_OpenFont(font_path.c_str(), 14);
   this->fps_font  = TTF_OpenFont(font_path.c_str(), 28);
+
+  ImGui::GetIO().IniFilename = imgui_ini_path.c_str();
 }
 
 void App::run() {
