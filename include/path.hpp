@@ -28,7 +28,7 @@ inline Path::~Path() = default;
 // smoothstepped lerp
 class LinePath : public Path {
 public:
-  LinePath(Vec2 a, Vec2 b);
+  inline LinePath(Vec2 a, Vec2 b) : a(a), b(b) {}
 
   virtual Vec2 sample_position(float t) const override;
   virtual float max_acceleration() const override;
@@ -39,5 +39,20 @@ public:
   virtual ~LinePath() override = default;
 private:
   Vec2 a, b;
+};
+
+class BezierPath : public Path {
+public:
+  inline BezierPath(Vec2 p0, Vec2 p1, Vec2 p2, Vec2 p3) : p0(p0), p1(p1), p2(p2), p3(p3) {}
+  
+  virtual Vec2 sample_position(float t) const override;
+  virtual float max_acceleration() const override;
+
+  void draw(SDL_Renderer *renderer, Viewport &viewport);
+  bool consume_event(SDL_Event &e);
+
+  virtual ~BezierPath() override = default;
+private:
+  Vec2 p0, p1, p2, p3;
 };
 }

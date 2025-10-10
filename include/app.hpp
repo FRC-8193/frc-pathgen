@@ -36,6 +36,6 @@ private:
   Robot robot;
   CameraController camera_controller;
   PathFollower path_follower;
-  LinePath path;
+  BezierPath path;
 };
 }

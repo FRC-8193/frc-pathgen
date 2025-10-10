@@ -24,6 +24,8 @@ struct Vec2 {
   inline Vec2& operator+=(const Vec2& o) { x += o.x; y += o.y; return *this; }
   inline Vec2& operator-=(const Vec2& o) { x -= o.x; y -= o.y; return *this; }
   inline Vec2& operator*=(const float& o) { x *= o; y *= o; return *this; }
+
+  inline static float dot(const Vec2& a, const Vec2& b) { return a.x*b.x+a.y*b.y; }
 };
 
 inline Vec2 operator*(float a, const Vec2& b) {

@@ -27,9 +27,13 @@ public:
 
   void tick(float dt);
 private:
+  float find_nearest_t();
+
   float time = 0.0f;
+  float last_path_t = 0.0f;
   float duration = 10.0f;
   float feedforward = 0.6f;
+  float lookahead = 0.1f;
   Path *path = nullptr;
   Robot &robot;
   PIDController<Vec2, float> position_pid;
