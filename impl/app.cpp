@@ -128,7 +128,6 @@ void App::run() {
     SDL_RenderClear(this->renderer);
 
     draw_world_gridlines(this->renderer, this->grid_font, this->viewport);
-
     
     ImGui_ImplSDLRenderer2_NewFrame();
     ImGui_ImplSDL2_NewFrame();
