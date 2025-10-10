@@ -97,7 +97,7 @@ void App::run() {
     float dt = (float)(time - last_time) / perf_freq; // seconds
     last_time = time;
 
-    fps = (1.0-dt) * fps + dt * (1.0 / dt);
+    fps = (1.0-dt) * fps + 1.0;
 
     ImGuiIO &io = ImGui::GetIO();
 
