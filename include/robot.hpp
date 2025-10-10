@@ -37,7 +37,6 @@ public:
     return this->velocity;
   }
 
-    // TODO: some better drawing utility stuff (wrap SDL_Renderer)
   void draw(SDL_Renderer *renderer, const Viewport &viewport);
 
   void set_velocity_setpoint(Vec2 velocity); // in m/s
