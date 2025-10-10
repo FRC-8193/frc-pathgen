@@ -73,10 +73,10 @@ void Robot::draw(SDL_Renderer *renderer, const Viewport &viewport) {
 }
 
 void Robot::set_velocity_setpoint(Vec2 velocity) {
-  this->velocity_setpoint = velocity;
+  if (!this->enable_keyboard_control) this->velocity_setpoint = velocity;
 }
 void Robot::set_angular_velocity_setpoint(float angular_velocity) {
-  this->angular_velocity_setpoint = angular_velocity;
+  if (!this->enable_keyboard_control) this->angular_velocity_setpoint = angular_velocity;
 }
 
 void Robot::tick(float dt) {

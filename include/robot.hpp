@@ -30,6 +30,12 @@ public:
   inline Vec2 get_frame_center() const {
     return this->frame_center;
   }
+  inline float get_rotation_radians() const {
+    return this->rotation_radians;
+  }
+  inline Vec2 get_velocity() const {
+    return this->velocity;
+  }
 
     // TODO: some better drawing utility stuff (wrap SDL_Renderer)
   void draw(SDL_Renderer *renderer, const Viewport &viewport);

@@ -12,6 +12,7 @@
 #include <SDL2/SDL_ttf.h>
 #include "camera_controller.hpp"
 #include "robot.hpp"
+#include "path_follower.hpp"
 
 namespace frc_pathgen {
 
@@ -33,5 +34,6 @@ private:
 
   Robot robot;
   CameraController camera_controller;
+  PathFollower path_follower;
 };
 }
