@@ -8,3 +8,4 @@ add_library(ImGui STATIC
 )
 
 target_include_directories(ImGui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/extern/imgui/ ${CMAKE_CURRENT_SOURCE_DIR}/extern/imgui/backends)
+target_link_libraries(ImGui PRIVATE ${SDL2_LIBRARIES})
