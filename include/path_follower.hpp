@@ -27,15 +27,19 @@ public:
 
   void tick(float dt);
 private:
+  float calc_vmax(float t);
+
   float time = 0.0f;
   Path *path = nullptr;
 
-  float feedforward = 0.4f;
+  float feedforward = 0.0f;
   Robot &robot;
   PIDController<Vec2, float> position_pid;
   Vec2 target;
   Vec2 gradient;
   float timescale = 1.0f;
+  float kappa = 0.0f;
+  float vtarg = 1.0f;
   PIDController<float> angle_pid;
 };
 }

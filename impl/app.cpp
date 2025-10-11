@@ -73,7 +73,10 @@ App::App() : robot(), camera_controller(this->viewport, &this->robot), path_foll
   this->grid_font = TTF_OpenFont(font_path.u8string().c_str(), 14);
   this->fps_font  = TTF_OpenFont(font_path.u8string().c_str(), 28);
 
-  ImGui::GetIO().IniFilename = imgui_ini_path.c_str();
+  ImGuiIO &io = ImGui::GetIO();
+
+  io.IniFilename = imgui_ini_path.c_str();
+  this->ui_font = io.Fonts->AddFontFromFileTTF(font_path.u8string().c_str());
 }
 
 void App::run() {

@@ -31,7 +31,6 @@ bool LinePath::consume_event(SDL_Event &e) {
 }
 
 Vec2 BezierPath::sample_position(float t) const {
-  //t = 3.0 * t * t - 2.0 * t * t * t;
   return powf(1.0f-t, 3.0f)*this->p0 + 3.0f*powf(1.0f-t, 2.0f)*t*this->p1 + 3.0f*(1.0f-t)*t*t*this->p2 + t*t*t*this->p3;
 }
 

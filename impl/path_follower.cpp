@@ -15,7 +15,7 @@
 namespace frc_pathgen {
 
 PathFollower::PathFollower(Robot &robot) : robot(robot), 
-  position_pid(40.0, 0.0, 2.0), angle_pid(7.5, 0.0, 1.5) {
+  position_pid(20.0, 0.0, 2.0), angle_pid(7.5, 0.0, 1.5) {
 }
 
 void PathFollower::set_path(Path &path) {
@@ -32,12 +32,31 @@ void PathFollower::draw(SDL_Renderer *renderer, const Viewport &viewport) {
 
   ImGui::Begin("Path Following Controls");
   ImGui::SliderFloat("Velocity Feedforward", &this->feedforward, 0.0f, 1.0f);
+  ImGui::Text("Timescale %f", this->timescale);
+  ImGui::Text("Curvature %f", this->kappa);
+  ImGui::Text("Vtarg     %f", this->vtarg);
   ImGui::End();
+}
+
+float PathFollower::calc_vmax(float t) {
+  static const float EPS = .001;
+  
+  Vec2 path_last    = this->path? this->path->sample_position(t-EPS) : Vec2 { 0,0 };
+  Vec2 path_current = this->path? this->path->sample_position(t) : Vec2 { 0,0 };
+  Vec2 path_next    = this->path? this->path->sample_position(t+EPS) : Vec2 { 0,0 };
+
+  Vec2 dpdt = (path_next-path_last) / (EPS * 2.0);
+  Vec2 d2pdt2 = (path_next - 2.0f * path_current + path_last) / (EPS * EPS);
+
+  this->kappa = Vec2::cross(dpdt, d2pdt2) / powf(dpdt.length(), 3.0f);
+  float vmax = 0.9 * sqrt(Robot::bot_acceleration / fmax(1e-4, fabsf(this->kappa)));
+
+  return vmax;
 }
 
 void PathFollower::tick(float dt) {
   static const float EPS = .001;
-
+  
   float t = this->time;
 
   if (t > 1.0) this->time = 0.0;
@@ -46,28 +65,38 @@ void PathFollower::tick(float dt) {
   Vec2 path_current = this->path? this->path->sample_position(t) : Vec2 { 0,0 };
   Vec2 path_next    = this->path? this->path->sample_position(t+EPS) : Vec2 { 0,0 };
 
-  Vec2 gradient = (path_next-path_last) / (EPS * 2.0);
+  Vec2 dpdt = (path_next-path_last) / (EPS * 2.0);
+  Vec2 d2pdt2 = (path_next - 2.0f * path_current + path_last) / (EPS * EPS);
+
+  this->kappa = Vec2::cross(dpdt, d2pdt2) / powf(dpdt.length(), 3.0f);
+  float vmax = 0.9 * sqrt(Robot::bot_acceleration / fmax(1e-4, fabsf(this->kappa)));
   
-  Vec2 accel = (path_next - 2.0f * path_current + path_last) / (EPS * EPS);
+  if (vmax > this->robot.get_velocity().length()) {
+    this->vtarg = this->robot.get_velocity().length() + Robot::bot_acceleration * dt;
+    spdlog::info("accel");
+  } else {
+    this->vtarg = this->robot.get_velocity().length() - Robot::bot_acceleration * dt;
+    spdlog::info("decel");
+  }
 
-  float timescale = sqrtf(Robot::bot_acceleration / accel.length());
-  timescale /= (1.0 + (this->robot.get_frame_center()-path_current).length());
-  timescale /= (1.0 + (this->robot.get_velocity()-this->timescale*gradient).length());
-  this->gradient = gradient*timescale;
-  this->timescale = timescale;
-
+  this->timescale = this->vtarg / dpdt.length();
+  this->gradient = dpdt * this->timescale;
+  
   Vec2 position_setpoint = path_current;
+  
+  if ((position_setpoint - this->robot.get_frame_center()).length() > 0.1) this->time = 0.0f;
+
   this->target = position_setpoint;
   float angle_setpoint = 0.0;
 
-  this->time += dt * timescale;
+  this->time += dt * this->timescale;
 
   Vec2 pos = this->robot.get_frame_center();
   float angle = this->robot.get_rotation_radians();
 
-  this->position_pid.kD = 10.0 * this->robot.get_velocity().length();
+  this->position_pid.kD = 15.0 * this->robot.get_velocity().length();
 
-  Vec2 velocity_setpoint = this->position_pid.update(position_setpoint, pos, dt) + this->feedforward * gradient * timescale;
+  Vec2 velocity_setpoint = this->position_pid.update(position_setpoint, pos, dt) + this->feedforward * this->gradient;
   float angular_velocity_setpoint = this->angle_pid.update(angle_setpoint, angle, dt);
 
   this->robot.set_velocity_setpoint(velocity_setpoint);

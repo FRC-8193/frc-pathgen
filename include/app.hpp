@@ -14,6 +14,7 @@
 #include "robot.hpp"
 #include "path_follower.hpp"
 #include "path.hpp"
+#include <imgui.h>
 
 namespace frc_pathgen {
 
@@ -31,6 +32,7 @@ private:
   SDL_Renderer *renderer;
   TTF_Font *grid_font;
   TTF_Font *fps_font;
+  ImFont *ui_font;
   Viewport viewport;
 
   Robot robot;
